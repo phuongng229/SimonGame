@@ -1,25 +1,26 @@
 var allColors = $(".btn");
 var random;
 var gameOver = false;
+var gameStart = false;
 var play = [];
 var pattern = [];
 
-//Start the game
-pressAToStart();
+$(document).keydown(function (event) {
+  if (gameStart && !gameOver) {
+    return;
+  }
 
-function pressAToStart() {
-  $(document).off("keydown"); //Clear old event listener
+  if (event.key === "a" || event.key === "A") {
+    resetGame();
+    startGame();
+  }
+});
 
-  $(document).keydown(function (event) {
-    if (event.key === "a" || event.key === "A") {
-      gameOver = false;
-      pattern.length = 0;
-      play.length = 0;
-      startGame();
-    } else {
-      alert("Please press A key to start!");
-    }
-  });
+function resetGame() {
+  play.length = 0;
+  pattern.length = 0;
+  gameStart = true;
+  gameOver = false;
 }
 
 //Start the sequence
@@ -31,7 +32,6 @@ function startGame() {
     $("#level-title").text("Level " + (pattern.length + 1));
     pushIntoPattern(random);
     console.log(pattern);
-    // debugger
     playPattern();
     play.length = 0;
   } else {
@@ -69,10 +69,9 @@ for (var j = 0; j < allColors.length; j++) {
 }
 
 function gameEnd() {
-  if (gameOver === true) {
-    $("#level-title").text("Game Over, please press A key to replay!");
-    pressAToStart();
-  }
+  gameOver = true;
+  gameStart = false;
+  $("#level-title").text("Game Over, please press A key to replay!");
 }
 
 function pushIntoPattern(random) {
@@ -87,35 +86,26 @@ function pushIntoPattern(random) {
   }
 }
 
+function flashPattern(color) {
+  $("#" + color)
+    .animate({ opacity: 0.1 }, 100)
+    .animate({ opacity: 1 }, 100);
+  makeSound(color);
+}
+
 function playPattern() {
   for (let i = 0; i < pattern.length; i++) {
     setTimeout(function () {
-      if (pattern[i] === "green") {
-        $("#green").animate({ opacity: 0.4 }).animate({ opacity: 1 });
-        makeSound("green");
-      } else if (pattern[i] === "red") {
-        $("#red").animate({ opacity: 0.4 }).animate({ opacity: 1 });
-        makeSound("red");
-      } else if (pattern[i] === "yellow") {
-        $("#yellow").animate({ opacity: 0.4 }).animate({ opacity: 1 });
-        makeSound("yellow");
-      } else if (pattern[i] === "blue") {
-        $("#blue").animate({ opacity: 0.4 }).animate({ opacity: 1 });
-        makeSound("blue");
-      }
+      flashPattern(pattern[i]);
     }, i * 400);
   }
 }
 
 function gameOverAnimation(color) {
-  
-    
-
-    $("body").addClass("game-over");
-    setTimeout(function () {
-      $("body").removeClass("game-over");
-    }, 220);
-  
+  $("body").addClass("game-over");
+  setTimeout(function () {
+    $("body").removeClass("game-over");
+  }, 220);
 }
 
 function buttonAnimationUser(color) {
@@ -124,25 +114,25 @@ function buttonAnimationUser(color) {
 
     setTimeout(function () {
       $("#green").removeClass("pressed");
-    }, 80);
+    }, 100);
   } else if (color === "red") {
     $("#red").addClass("pressed");
 
     setTimeout(function () {
       $("#red").removeClass("pressed");
-    }, 80);
+    }, 100);
   } else if (color === "yellow") {
     $("#yellow").addClass("pressed");
 
     setTimeout(function () {
       $("#yellow").removeClass("pressed");
-    }, 80);
+    }, 100);
   } else if (color === "blue") {
     $("#blue").addClass("pressed");
 
     setTimeout(function () {
       $("#blue").removeClass("pressed");
-    }, 80);
+    }, 100);
   }
 }
 
